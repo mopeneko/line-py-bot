@@ -13,6 +13,7 @@ akad = "==0.11.1"
 requests = "*"
 rsa = "*"
 PyQRCode = "*"
+simplejson = "*"
 
 [requires]
 python_version = "3.7"
