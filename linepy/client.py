@@ -9,8 +9,9 @@ from .timeline import Timeline
 from .server import Server
 from .shop import Shop
 from .callback import Callback
+from .liff import Liff
 
-class LINE(Auth, Models, Talk, Square, Call, Timeline, Shop):
+class LINE(Auth, Models, Talk, Square, Call, Timeline, Shop, Liff):
 
     def __init__(self, idOrAuthToken=None, passwd=None, **kwargs):
         """
@@ -62,3 +63,4 @@ class LINE(Auth, Models, Talk, Square, Call, Timeline, Shop):
         Call.__init__(self)
         Timeline.__init__(self)
         Shop.__init__(self)
+        Liff.__init__(self)

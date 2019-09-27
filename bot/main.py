@@ -3,8 +3,8 @@
 
 import sys
 
-from linepy import LINE, OEPoll
 from akad.ttypes import Message
+from linepy import LINE, OEPoll
 
 from .operator import Operator
 
@@ -17,7 +17,7 @@ class LinePyBot(Operator):
         line.start()
     """
 
-    def __init__(self, token:str):
+    def __init__(self, token: str):
         self.line = LINE(token, appType="IOS", customThrift=True)
         self.poll = OEPoll(self.line)
         self.mid = self.line.profile.mid
@@ -32,4 +32,4 @@ class LinePyBot(Operator):
             self.sendMessage(to, "再起動しました")
 
     def __init_all__(self):
-        Operator.__init__(self)
+        Operator(self)
