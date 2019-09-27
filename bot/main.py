@@ -28,8 +28,8 @@ class LinePyBot(Operator):
     def check_restart(self):
         argv = sys.argv
         if len(argv) >= 2:
-            msg = eval(argv[1])
-            self.line.sendMessage(msg.to, "再起動しました")
+            to = argv[1]
+            self.sendMessage(to, "再起動しました")
 
     def __init_all__(self):
         Operator.__init__(self)

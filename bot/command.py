@@ -1,7 +1,9 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
+# コマンドをここにかく
 
 import time
+import os
 
 from akad.ttypes import Message
 
@@ -47,3 +49,7 @@ class Command:
         receive_time = (_msg.createdTime - msg.createdTime) / 1000
         self.sendMessage(msg.to, f"[recv]: {receive_time:.5f}" + "\n" \
                                  f"[send]: {process_time:.5f}")
+
+    def reboot(self, msg):
+        self.sendMessage(msg.to, "...")
+        os.execvp("python3", ["python3", "main.py", msg.to])

@@ -1,5 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
+# オペレーションごとに関数を分ける
+# コマンドはcommandから引っ張ってくる
 
 import time
 
@@ -44,3 +46,6 @@ class Operator(Command, Messages):
 
                 if self.is_command(msg, ["speed"], to_types=[1, 2]):
                     self.get_speed(msg)
+
+                if self.is_command(msg, ["reboot"]):
+                    self.reboot(msg)
