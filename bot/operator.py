@@ -5,7 +5,7 @@
 
 import time
 
-from akad.ttypes import OpType, Operation, ContentType
+from akad.ttypes import ContentType, Operation, OpType
 
 from .command import Command
 from .messages import Messages
