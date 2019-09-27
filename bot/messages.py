@@ -10,37 +10,25 @@ from akad.ttypes import Message
 
 class Messages:
 
-    def __init__(self):
-        self.mention_mid_pattern = re.compile(r"@[ua-zA-z0-9]{33}")
+    def sendMessageWithMention(self, to, text, mids):
+        """
+        params
+            text: 'hogehoge @{}'
+            mids: list
+        """
+        if text.count("@{}") != len(mids):
+            raise Exception
 
-    def get_mention_metadata(self, text):
-        """何故か文字数のカウントが異なるため使用不可"""
         mentionees = []
-        count = len(self.mention_mid_pattern.findall(text))
-        flag = 0
-        for i in range(count):
-            matched = self.mention_mid_pattern.search(text, flag)
-            start = matched.span()[0]
-            mid = matched.group()[1:]
+        names = list(map(lambda mid: self.line.getContact(mid).displayName, mids))
+        text = text.format(*names)
 
-            displayName = self.line.getContact(mid).displayName
-            string_name = f"@{displayName}"
-            oend = start + 34
-            end = start + len(string_name)
-
-            text = text[:start] + string_name + text[oend:]
-
-            flag = end
-
+        for name, mid in zip(names, mids):
+            standard = text.find(name)
+            start = standard - 1
+            end = standard + len(name)
             mentionees.append({"S": str(start), "E": str(end), "M": mid})
-        return text, {'MENTION': json.dumps({"MENTIONEES": mentionees})}
 
-    def sendMessageWithMention(self, to, text):
-        mentionees = []
-        for matched in self.mention_mid_pattern.finditer(text):
-            start, end = matched.span()
-            mid = matched.group()[1:]
-            mentionees.append({"S": str(start), "E": str(end), "M": mid})
         contentMetadata = {'MENTION': json.dumps({"MENTIONEES": mentionees})}
         return self.sendMessage(to, text, contentMetadata=contentMetadata)
 
