@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # コマンドをここにかく
 
-import time
 import os
+import time
 
 from akad.ttypes import Message
 
