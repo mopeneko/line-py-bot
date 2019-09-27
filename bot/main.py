@@ -32,4 +32,4 @@ class LinePyBot(Operator):
             self.sendMessage(to, "再起動しました")
 
     def __init_all__(self):
-        Operator(self)
+        Operator.__init__(self)
