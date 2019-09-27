@@ -13,28 +13,6 @@ class Messages:
     def __init__(self):
         self.mention_mid_pattern = re.compile(r"@[ua-zA-z0-9]{33}")
 
-    def get_mention_metadata(self, text):
-        """何故か文字数のカウントが異なるため使用不可"""
-        mentionees = []
-        count = len(self.mention_mid_pattern.findall(text))
-        flag = 0
-        for i in range(count):
-            matched = self.mention_mid_pattern.search(text, flag)
-            start = matched.span()[0]
-            mid = matched.group()[1:]
-
-            displayName = self.line.getContact(mid).displayName
-            string_name = f"@{displayName}"
-            oend = start + 34
-            end = start + len(string_name)
-
-            text = text[:start] + string_name + text[oend:]
-
-            flag = end
-
-            mentionees.append({"S": str(start), "E": str(end), "M": mid})
-        return text, {'MENTION': json.dumps({"MENTIONEES": mentionees})}
-
     def sendMessageWithMention(self, to, text):
         mentionees = []
         for matched in self.mention_mid_pattern.finditer(text):
