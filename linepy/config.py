@@ -18,6 +18,7 @@ class Config(object):
     LINE_CHAN_QUERY_PATH        = '/CH4'
     LINE_SQUARE_QUERY_PATH      = '/SQS1'
     LINE_SHOP_QUERY_PATH        = '/SHOP4'
+    LINE_LIFF_QUERY_PATH        = '/LIFF1'
 
     CHANNEL_ID = {
         'LINE_TIMELINE': '1341209850',

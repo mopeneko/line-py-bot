@@ -26,8 +26,9 @@ class Auth(object):
         self.poll       = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_POLL_QUERY_PATH_FIR, self.customThrift).Talk()
         self.call       = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_CALL_QUERY_PATH, self.customThrift).Call()
         self.channel    = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_CHAN_QUERY_PATH, self.customThrift).Channel()
-        self.square     = Session("https://square-api.line.me", self.server.Headers, self.server.LINE_SQUARE_QUERY_PATH, self.customThrift).Square()
+        # self.square     = Session("a", self.server.Headers, self.server.LINE_SQUARE_QUERY_PATH, self.customThrift).Square()
         self.shop       = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_SHOP_QUERY_PATH, self.customThrift).Shop()
+        self.liff       = Session(self.server.LINE_HOST_DOMAIN, self.server.Headers, self.server.LINE_LIFF_QUERY_PATH).Liff()
 
         self.revision = self.poll.getLastOpRevision()
         self.isLogin = True
