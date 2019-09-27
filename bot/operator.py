@@ -9,9 +9,10 @@ from akad.ttypes import OpType, Operation, ContentType
 
 from .command import Command
 from .messages import Messages
+from .function import Function
 
 
-class Operator(Command, Messages):
+class Operator(Command, Messages, Function):
 
     def __init__(self):
         self.poll.addOpInterruptWithDict({
@@ -21,6 +22,7 @@ class Operator(Command, Messages):
 
         Command.__init__(self)
         Messages.__init__(self)
+        Function.__init__(self)
 
     def start(self):
         while True:
@@ -49,3 +51,5 @@ class Operator(Command, Messages):
 
                 if self.is_command(msg, ["reboot"]):
                     self.reboot(msg)
+
+        self.read_message(msg)
