@@ -22,7 +22,7 @@ class Function:
     def get_string(self, string):
         return string if string else ""
 
-    def get_contact(self, msg, mid):
+    def send_contact_info(self, msg, mid):
         contact = self.line.getContact(mid)
 
         mid = contact.mid
