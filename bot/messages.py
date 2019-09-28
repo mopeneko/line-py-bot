@@ -12,6 +12,7 @@ from akad.ttypes import Message
 class Messages:
 
     def sendMessageWithMention(self, to, text, mids):
+        # TODO: ユーザーの名前がデコ文字の場合の対応
         """
         params
             text: 'hogehoge @{}'
@@ -25,9 +26,8 @@ class Messages:
         text = text.format(*names)
 
         for name, mid in zip(names, mids):
-            standard = text.find(name)
-            start = standard - 1
-            end = standard + len(name)
+            start = text.find("@" + name)
+            end = start + len("@" + name)
             mentionees.append({"S": str(start), "E": str(end), "M": mid})
 
         contentMetadata = {'MENTION': json.dumps({"MENTIONEES": mentionees})}
