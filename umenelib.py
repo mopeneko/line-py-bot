@@ -64,7 +64,7 @@ class Api:
         )
 
 
-class Other(object):
+class Other:
     def translateWithGoogle(self, word):
         '''Google翻訳APIで翻訳する'''
         headers = {
