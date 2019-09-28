@@ -9,7 +9,7 @@ def loggedIn(func):
         else:
             args[0].callback.default('You want to call the function, you must login to LINE')
     return checkLogin
-    
+
 class Object(object):
 
     def __init__(self):
@@ -36,11 +36,11 @@ class Object(object):
         if type == 'vp':
             params.update({'ver': '2.0', 'cat': 'vp.mp4'})
         data = {'params': self.genOBSParams(params)}
-        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/p/upload.nhn', data=data, files=files)
+        r = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/p/upload.nhn', headers=self.server.Headers, data=data, files=files)
         if r.status_code != 201:
             raise Exception('Update profile picture failure.')
         return True
-        
+
     @loggedIn
     def updateProfileVideoPicture(self, path):
         try:
@@ -63,7 +63,7 @@ class Object(object):
             raise Exception('Invalid returnAs value')
         files = {'file': open(path, 'rb')}
         data = {'params': self.genOBSParams({'oid': self.profile.mid,'ver': '2.0','type': 'video','cat': 'vp.mp4'})}
-        r_vp = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/vp/upload.nhn', data=data, files=files)
+        r_vp = self.server.postContent(self.server.LINE_OBS_DOMAIN + '/talk/vp/upload.nhn', headers=self.server.Headers, data=data, files=files)
         if r_vp.status_code != 201:
             raise Exception('Update profile video picture failure.')
         self.updateProfilePicture(path_p, 'vp')
