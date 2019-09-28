@@ -50,4 +50,8 @@ class Operator(Command, Messages, Function):
                 if self.is_command(msg, ["reboot"]):
                     self.reboot(msg)
 
+        if msg.contentType == ContentType.CONTACT:
+            if "mid" in msg.contentMetadata:
+                self.get_contact(msg, msg.contentMetadata["mid"])
+
         self.read_message(msg)
