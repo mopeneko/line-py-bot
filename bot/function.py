@@ -26,16 +26,16 @@ class Function:
         contact = self.line.getContact(mid)
 
         mid = contact.mid
-        added_time = self.get_line_time(contact.createdTime, "%Y-%m-%d %H:%M:%S")
-        contact_type = get_contact_type(contact.type)
-        contact_status = get_contact_status(contact.status)
+        # added_time = self.get_line_time(contact.createdTime, "%Y-%m-%d %H:%M:%S")
+        # contact_type = get_contact_type(contact.type)
+        # contact_status = get_contact_status(contact.status)
         # ContactRelationは多分正しくない
         name = contact.displayName
         # phonetic_name = contact.phoneticName if contact.phoneticName else ""
         picture = f"https://obs-jp.line-apps.com/{contact.pictureStatus}" if contact.pictureStatus else ""
         # conatct.statusMessage
-        handle_name = self.get_string(contact.displayNameOverridden)  # コテハン
-        favorite_time = self.get_line_time(contact.favoriteTime, "%Y-%m-%d %H:%M:%S")
+        # handle_name = self.get_string(contact.displayNameOverridden)  # コテハン
+        # favorite_time = self.get_line_time(contact.favoriteTime, "%Y-%m-%d %H:%M:%S")
         account_type = "公式アカウント "if contact.capableBuddy else "通常アカウント"
         # contact.musicProfile
         video = f"https://obs-jp.line-apps.com/{contact.pictureStatus}/vp" if contact.videoProfile else ""
@@ -43,10 +43,5 @@ class Function:
         return self.sendMessage(msg.to, f"[MID]\n{mid}" + "\n\n" \
                                         f"[アカウントの種類]\n{account_type}" + "\n\n" \
                                         f"[名前]\n{name}" + "\n\n" \
-                                        f"[固定ハンドルネーム]\n{handle_name}" + "\n\n" \
                                         f"[プロフィール画像]\n{picture}" + "\n\n" \
-                                        f"[プロフィール動画]\n{video}" + "\n\n" \
-                                        f"[関係]\n{contact_status}" + "\n\n" \
-                                        f"[追加方法]\n{contact_type}" + "\n\n" \
-                                        f"[追加した日時]\n{added_time}" + "\n\n" \
-                                        f"[お気に入りにした日時]\n{favorite_time}")
+                                        f"[プロフィール動画]\n{video}" + "\n\n")
