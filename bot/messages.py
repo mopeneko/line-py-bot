@@ -11,7 +11,7 @@ from akad.ttypes import Message
 class Messages:
 
     def __init__(self):
-        self.mention_mid_pattern = re.compile(r"@[ua-zA-z0-9]{33}")
+        pass
 
     def sendMessageWithMention(self, to, text):
         mentionees = []
