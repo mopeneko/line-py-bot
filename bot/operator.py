@@ -20,9 +20,7 @@ class Operator(Command, Messages, Function):
             OpType.RECEIVE_MESSAGE: self.RECEIVE_MESSAGE,
         })
 
-        Command(self)
-        Messages(self)
-        Function(self)
+        super().__init__()
 
     def start(self):
         while True:
