@@ -11,15 +11,25 @@ from akad.ttypes import Message
 
 class Messages:
 
-    def __init__(self):
-        self.mention_mid_pattern = re.compile(r"@[ua-zA-z0-9]{33}")
+    def sendMessageWithMention(self, to, text, mids):
+        """
+        params
+            text: 'hogehoge @{}'
+            mids: list
+        """
+        if text.count("@{}") != len(mids):
+            raise Exception
 
-    def sendMessageWithMention(self, to, text):
         mentionees = []
-        for matched in self.mention_mid_pattern.finditer(text):
-            start, end = matched.span()
-            mid = matched.group()[1:]
+        names = list(map(lambda mid: self.line.getContact(mid).displayName, mids))
+        text = text.format(*names)
+
+        for name, mid in zip(names, mids):
+            standard = text.find(name)
+            start = standard - 1
+            end = standard + len(name)
             mentionees.append({"S": str(start), "E": str(end), "M": mid})
+
         contentMetadata = {'MENTION': json.dumps({"MENTIONEES": mentionees})}
         return self.sendMessage(to, text, contentMetadata=contentMetadata)
 
