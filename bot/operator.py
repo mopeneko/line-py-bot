@@ -13,6 +13,7 @@ from .function import Function
 
 
 class Operator(Command, Messages, Function):
+    reqSeq_ids = {}
 
     def __init__(self):
         self.poll.addOpInterruptWithDict({
@@ -53,5 +54,8 @@ class Operator(Command, Messages, Function):
         if msg.contentType == ContentType.CONTACT:
             if "mid" in msg.contentMetadata:
                 self.get_contact(msg, msg.contentMetadata["mid"])
+
+        if msg.contentType == ContentType.MUSIC:
+            self.send_music_profile_meta(msg)
 
         self.read_message(msg)

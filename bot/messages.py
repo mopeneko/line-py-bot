@@ -3,13 +3,17 @@
 # linepyで足りないメッセージの関数を補う
 
 import re
+from base64 import b64encode
+import time
 
 import simplejson as json
+import requests
 
-from akad.ttypes import Message
+from akad.ttypes import Message, ContentType, FeatureType
 
 
 class Messages:
+    reqSeq=0
 
     def sendMessageWithMention(self, to, text, mids):
         """
@@ -46,4 +50,40 @@ class Messages:
             msg.relatedMessageServiceCode = 1
             msg.messageRelationType = 3
 
-        return self.line.talk.sendMessage(0, msg)
+        self.reqSeq += 1
+
+        return self.line.talk.sendMessage(self.reqSeq, msg), self.reqSeq
+
+    def sendImage(self, msg, path):
+        reqSeq = self.sendMessage(msg.to, contentType=ContentType.IMAGE)[1]
+
+        params = b64encode(json.dumps({
+            "reqseq": str(reqSeq),
+            "ver": "1.0",
+            "tomid": msg.to,
+            "type": "image",
+            "oid": "reqseq",
+            "name": path,
+            "cat": "original"
+        }).encode("utf-8"))
+
+        f = open(path, 'rb')
+        data = f.read()
+
+        headers = {
+            'Accept': '*/*',
+            'Content-Type': 'application/octet-stream',
+            'X-Line-Application': self.line.server.APP_NAME,
+            'Connection': 'Keep-Alive',
+            'x-obs-params': params,
+            'X-Line-Access': self.line.acquireEncryptedAccessToken(FeatureType.OBS_GENERAL),
+            'X-Line-Carrier': self.line.server.CARRIER,
+            'Accept-Language': 'ja-jp',
+            'User-Agent': f'LI/{self.line.server.APP_VER} iPhone8,1 {self.line.server.SYSTEM_VER}',
+            'Accept-Encoding': 'gzip',
+            'Content-Length': str(len(data)),
+        }
+
+        r = requests.post("https://obs-jp.line-apps.com:443/r/talk/m/reqseq", headers=headers, data=data)
+
+        return r.headers

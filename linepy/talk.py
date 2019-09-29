@@ -104,7 +104,7 @@ class Talk(object):
         if to not in self._messageReq:
             self._messageReq[to] = -1
         self._messageReq[to] += 1
-        return self.talk.sendMessage(self._messageReq[to], msg)
+        return self.talk.sendMessage(self._messageReq[to], msg), self._messageReq[to]
 
     @loggedIn
     def sendMessageObject(self, msg):
@@ -305,7 +305,7 @@ class Talk(object):
             'STKID': stickerId
         }
         return self.sendMessage(to, '', contentMetadata, 7)
-        
+
     @loggedIn
     def sendContact(self, to, mid):
         contentMetadata = {'mid': mid}
@@ -349,7 +349,7 @@ class Talk(object):
     @loggedIn
     def removeMessage(self, messageId):
         return self.talk.removeMessage(messageId)
-    
+
     @loggedIn
     def removeAllMessages(self, lastMessageId):
         return self.talk.removeAllMessages(0, lastMessageId)
@@ -361,7 +361,7 @@ class Talk(object):
     @loggedIn
     def destroyMessage(self, chatId, messageId):
         return self.talk.destroyMessage(0, chatId, messageId, sessionId)
-    
+
     @loggedIn
     def sendChatChecked(self, consumer, messageId):
         return self.talk.sendChatChecked(0, consumer, messageId)
@@ -433,7 +433,7 @@ class Talk(object):
         return self.sendFile(to, path, fileName)
 
     """Contact"""
-        
+
     @loggedIn
     def blockContact(self, mid):
         return self.talk.blockContact(0, mid)
@@ -505,7 +505,7 @@ class Talk(object):
     @loggedIn
     def reissueUserTicket(self, expirationTime=100, maxUseCount=100):
         return self.talk.reissueUserTicket(expirationTime, maxUseCount)
-    
+
     @loggedIn
     def cloneContactProfile(self, mid, channel):
         contact = self.getContact(mid)
@@ -540,7 +540,7 @@ class Talk(object):
     @loggedIn
     def getGroupWithoutMembers(self, groupId):
         return self.talk.getGroupWithoutMembers(groupId)
-    
+
     @loggedIn
     def findGroupByTicket(self, ticketId):
         return self.talk.findGroupByTicket(ticketId)
@@ -645,17 +645,17 @@ class Talk(object):
         return self.talk.leaveRoom(0, roomId)
 
     """Call"""
-        
+
     @loggedIn
     def acquireCallTalkRoute(self, to):
         return self.talk.acquireCallRoute(to)
-    
+
     """Report"""
 
     @loggedIn
     def reportSpam(self, chatMid, memberMids=[], spammerReasons=[], senderMids=[], spamMessageIds=[], spamMessages=[]):
         return self.talk.reportSpam(chatMid, memberMids, spammerReasons, senderMids, spamMessageIds, spamMessages)
-        
+
     @loggedIn
     def reportSpammer(self, spammerMid, spammerReasons=[], spamMessageIds=[]):
         return self.talk.reportSpammer(spammerMid, spammerReasons, spamMessageIds)
