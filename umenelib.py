@@ -1,59 +1,71 @@
-from datetime import datetime
-from gtts import gTTS
-import requests
+import os
+import json
 import random
 import string
-import json
 import urllib
+from datetime import datetime
 
-## Thanks to domao ##
+import requests
+from gtts import gTTS
+from imgurpython import ImgurClient
 
-class Api(object):
-    def imageToUrl(self,id,secret,image_path):
-        client = ImgurClient(id, secret)
+
+class Api:
+    def imageToUrl(self, id_, secret, image_path):
+        client = ImgurClient(id_, secret)
         upload = client.upload_from_path(image_path, config=None, anon=True)
-        return upload["link"]
+        image_url = upload["link"]
+        return image_url
 
-    def shortenWithBitly(self,token,url):
+    def shortenWithBitly(self, token, url):
         '''URL短縮(要トークン)'''
-        token = token
-        query = {
-                'access_token': token,
-                'longurl':url
-                }
-        r = requests.get('https://api-ssl.bitly.com/v3/shorten',params=query).json()['data']['url']
-        return r
+        params = {
+            'access_token': token,
+            'longurl': url
+        }
+        response = requests.get(
+            'https://api-ssl.bitly.com/v3/shorten',
+            params=params
+        )
+        shorten_url = response.json()['data']['url']
+        return shorten_url
 
-    def textToSpeechWithDocomo(self,apiKey,title, message, path="./",speaker="1",style="1",rate="1",format="2"):
+    def textToSpeechWithDocomo(
+            self, apiKey, title, message, path="./", speaker="1",
+            style="1", rate="1", audio_format="2"):
         '''Docomo Text To Speech API で 読み上げを行う'''
-        if not os.path.isfile(path+title+".wav"):
-            try:
-                url = 'https://api.apigw.smt.docomo.ne.jp/crayon/v1/textToSpeech?APIKEY=%s' % apiKey
-                params = {
-                      "Command":"AP_Synth",
-                      "SpeakerID":speaker,
-                      "StyleID":style,
-                      "SpeechRate":rate,
-                      "AudioFileFormat":format,
-                      "TextData":message
-                    }
-                r = requests.post(url, data=json.dumps(params))
-                if r.status_code == 200:
-                    with open(path+title+".wav","wb") as f:
-                        f.write(r.content)
-                    return path+title+".wav"
-            except Exception as e:
-                print(e)
+        file_path = path + title + ".wav"
+        if os.path.isfile(file_path):
+            return
+        url = 'https://api.apigw.smt.docomo.ne.jp/crayon/v1/textToSpeech?APIKEY=%s' % apiKey
+        params = {
+            "Command": "AP_Synth",
+            "SpeakerID": speaker,
+            "StyleID": style,
+            "SpeechRate": rate,
+            "AudioFileFormat": audio_format,
+            "TextData": message
+        }
+        response = requests.post(url, data=json.dumps(params))
+        if response.status_code != 200:
+            return
+        with open(file_path, "wb") as f:
+            f.write(response.content)
+        return file_path
 
-    def sendLineNotify(self,token,message):
+    def sendLineNotify(self, token, message):
         '''Line Notifyで通知する'''
-        headers = {'Authorization' : 'Bearer ' + token}
-        payload = {'message' : message}
-        r = requests.post('https://notify-api.line.me/api/notify', headers=headers, params=payload)
+        headers = {'Authorization': 'Bearer ' + token}
+        payload = {'message': message}
+        requests.post(
+            'https://notify-api.line.me/api/notify',
+            headers=headers,
+            params=payload
+        )
 
 
-class Other(object):
-    def translateWithGoogle(self,word):
+class Other:
+    def translateWithGoogle(self, word):
         '''Google翻訳APIで翻訳する'''
         headers = {
             "User-Agent": "GoogleTranslate/5.9.59004 (iPhone; iOS 10.2; ja; iPhone9,1)"
@@ -65,103 +77,113 @@ class Other(object):
             "q": word,
             "tl": "ja"
         }
-        r = requests.get(url="https://translate.google.com/translate_a/single", headers=headers, params=params)
-        r = r.json()
-        return r["sentences"][0]["trans"]
+        response = requests.get(
+            "https://translate.google.com/translate_a/single",
+            headers=headers,
+            params=params
+        )
+        translated_text = response.json()["sentences"][0]["trans"]
+        return translated_text
 
-    def ojichatify(self,name,emojiLevel=3,punctiuationLevel=1):
+    def ojichatify(self, name, emojiLevel=3, punctiuationLevel=1):
         '''文字列をおじさん風に'''
-        payload = {'name': name, 'emoji_level': emojiLevel, "punctiuation_level": punctiuationLevel}
-        r = requests.post("https://ojichat.appspot.com/post", data=payload)
-        data = r.json()
-        return data['message']
+        payload = {
+            'name': name,
+            'emoji_level': emojiLevel,
+            "punctiuation_level": punctiuationLevel
+        }
+        response = requests.post("https://ojichat.appspot.com/post", data=payload)
+        ojichatified_text = response.json()['message']
+        return ojichatified_text
 
-    def shortenWithTinyurl(self,url):
+    def shortenWithTinyurl(self, url):
         '''URL短縮(トークン不要)'''
-        r = requests.get("http://tinyurl.com/api-create.php?url=%s" % url)
-        return r.text
+        response = requests.get("http://tinyurl.com/api-create.php?url=" + url)
+        shorten_url = response.text
+        return shorten_url
 
-    def generateLinkWithImgGoogle(self,text):
-        '''Google画像検索リンクを作る'''
-        r = self.shortenWithTinyurl('https://www.google.co.jp/search?q=%s&tbm=isch' % urllib.parse.quote(text))
-        return r
+    def generateSearchLink(self, service_name, text):
+        """検索リンクを作る"""
+        services = {
+            "google": 'https://www.google.co.jp/search?',
+            "google_image": 'https://www.google.co.jp/search?tbm=isch&q=',
+            "youtube": 'https://www.youtube.com/results?search_query=',
+            "yahoo": 'https://search.yahoo.co.jp/search?p=',
+            "bing": 'https://www.bing.com/search?q='
+        }
+        if service_name not in services:
+            return
+        shorten_search_url = self.shortenWithTinyurl(
+            services[service_name] + urllib.parse.quote(text))
+        return shorten_search_url
 
-    def generateLinkWithGoogle(self,text):
-        '''Google検索リンクを作る'''
-        r = self.shortenWithTinyurl('https://www.google.co.jp/search?' + urllib.parse.quote(text))
-        return r
-
-    def generateLinkWithYoutube(self,text):
-        '''Youtube検索リンクを作る'''
-        r = self.shortenWithTinyurl('https://www.youtube.com/results?search_query=' + urllib.parse.quote(text))
-        return r
-
-    def generateLinkWithYahoo(self,text):
-        '''Yahoo検索リンクを作る'''
-        r = self.shortenWithTinyurl('https://search.yahoo.co.jp/search?p=' + urllib.parse.quote(text))
-        return r
-
-    def generateLinkWithBing(self,text):
-        '''Bing検索リンクを作る'''
-        r = self.shortenWithTinyurl('https://www.bing.com/search?q=' + urllib.parse.quote(text))
-        return r
     def drawFortune(self):
         '''おみくじをひく'''
-        r = random.choice(["大吉","中吉","小吉","末吉","大凶","凶"])
-        return r
+        random_result = random.choice(["大吉", "中吉", "小吉", "末吉", "大凶", "凶"])
+        return random_result
 
-    def convertFilesize(self,byte):
+    def convertFilesize(self, file_size):
         '''ファイルサイズの単位を変換して文字列にする'''
-        if byte < 1024:
-            return str(byte) + ' Bytes'
-        elif byte < 1024 ** 2:
-            return str(round((byte / 1024.0), 1)) + ' KB'
-        elif byte < 1024 ** 3:
-            return str(round((byte / 1024.0), 1)) + ' MB'
-        elif byte < 1024 ** 4:
-            return str(round((byte / 1024.0), 1)) + ' GB'
-        elif byte < 1024 ** 5:
-            return str(round((byte / 1024.0), 1)) + ' TB'
+        kb = 1024
+        mb = pow(kb, 2)
+        gb = pow(kb, 3)
+        tb = pow(kb, 4)
+        if file_size >= tb:
+            target = tb
+            unit = "TB"
+        elif file_size >= gb:
+            target = gb
+            unit = "GB"
+        elif file_size >= mb:
+            target = mb
+            unit = "MB"
+        elif file_size >= kb:
+            target = kb
+            unit = "KB"
         else:
-            return str(byte) + ' Bytes'
+            target = 1
+            unit = "B"
+        new_file_size = file_size / target
+        converted_text = f"{new_file_size:.1f}{unit}"
+        return converted_text
 
-    def generateRandCharacter(self,quantity=6):
+    def generateRandCharacter(self, quantity=6):
         '''指定した字数のランダムな文字列を作る'''
-        r = ''.join(random.choices(string.ascii_letters + string.digits, k=quantity))
-        return r
+        random_string = ''.join(
+            random.choices(string.ascii_letters + string.digits, k=quantity)
+        )
+        return random_string
 
-    def convertCiplex(self,word):
+    def convertCiplex(self, word):
         '''簡易暗号化/複合化'''
-        list = []
-        r = ''
-        for i in range (0, len(word)):
-            if word[i].islower():
-                list.insert(i, chr(219-ord(word[i])))
+        string_list = []
+        for string in word:
+            if string.islower():
+                string_list.append(chr(219 - ord(string)))
             else:
-                list.insert(i, word[i])
-        for ii in range (0, len(word)):
-            r += list[ii]
-        return r
+                string_list.append(string)
+        converted_text = "".join(string_list)
+        return converted_text
 
-    def convertLineTime(self,time):
+    def convertLineTime(self, time):
         '''Line Time を 日付文字列にする'''
-        r = datetime.fromtimestamp(time / 1000).strftime("%Y/%m/%d %H:%M:%S")
-        return r
+        date_string = datetime.fromtimestamp(time / 1000).strftime("%Y/%m/%d %H:%M:%S")
+        return date_string
 
-    def generateMusicMeta(self,name,id="mb00000000016d2e75",artist="",imageurl="https://pixabay.com/images/id-3386570/",url="https://www.google.com/"):
+    def generateMusicMeta(self, name, track_id="mb00000000016d2e75", artist="", imageurl="https://pixabay.com/images/id-3386570/", url="https://www.google.com/"):
         '''音楽型のMetadataを作る'''
-        r = {
-            "id": id,
+        music_meta = {
+            "id": track_id,
             "name": name,
-            "artistName":artist,
-            "imageUrl":imageurl,
+            "artistName": artist,
+            "imageUrl": imageurl,
             "url": url,
             "type": "mt",
             "country": "JP"
         }
-        return r
+        return music_meta
 
-    def generateRealFace(self,savename,path="./"):
+    def generateRealFace(self, savename, path="./"):
         '''AIが作成した三次元の存在しない顔の画像をDLする'''
         headers = {
             'Host': 'thispersondoesnotexist.com',
@@ -175,21 +197,30 @@ class Other(object):
             'Cache-Control': r'max-age=0',
             'TE': 'Trailers'
         }
-        r = requests.get('https://thispersondoesnotexist.com/image', headers=headers, stream=True)
+        response = requests.get(
+            'https://thispersondoesnotexist.com/image',
+            headers=headers,
+            stream=True
+        )
         with open('%s%s.jpeg' % (path, savename), 'wb') as f:
-            f.write(r.content)
-    def generateVirtualFace(self,savename,path="./"):
+            f.write(response.content)
+
+    def generateVirtualFace(self, savename, path="./"):
         '''AIが作成した二次元の画像をDLする'''
-        url = "https://www.thiswaifudoesnotexist.net/example-%d.jpg" % random.randint(0,60000)
-        
-        with urllib.request.urlopen(url) as f:
-            data = f.read()
-            with open('%s%s.jpeg' % (path, savename), 'wb') as f:
-                f.write(data)
-    def textToSpeechWithGoogle(self,text,savename=text,lang="en",path="./"):
+        random_num = random.randint(0, 60000)
+        url = f"https://www.thiswaifudoesnotexist.net/example-{random_num}.jpg"
+
+        response = requests.get(url)
+        with open('%s%s.jpeg' % (path, savename), 'wb') as f:
+            f.write(response.content)
+
+    def textToSpeechWithGoogle(self, text, savename=None, lang="en", path="./"):
         '''Google API で読み上げを行う'''
         goo = gTTS(text=text, lang=lang)
+        if savename is None:
+            savename = text
         goo.save('%s%s.mp3' % (path, savename))
+
 
 if __name__ == "__main__":
     lib = Other()
@@ -201,13 +232,9 @@ if __name__ == "__main__":
     print(lib.convertLineTime(11100000))
     print(lib.generateMusicMeta("UmeneLib"))
     print(lib.shortenWithTinyurl("http://gochiusa.com"))
-    print(lib.generateLinkWithImgGoogle("Kafuu chino"))
-    print(lib.generateLinkWithGoogle("Kafuu chino"))
-    print(lib.generateLinkWithYoutube("Kafuu chino"))
-    print(lib.generateLinkWithYahoo("Kafuu chino"))
-    print(lib.generateLinkWithBing("Kafuu chino"))
+    print(lib.generateSearchLink("google", "Kafuu chino"))
     print(lib.translateWithGoogle("Kafuu chino"))
     print(lib.ojichatify("香風智乃"))
     print(lib.generateVirtualFace("Kafuu chino"))
     print(lib.generateRealFace("Kafuu chino"))
-    print(lib.textToSpeechByGoogle("Kafuu chino","chino"))
+    print(lib.textToSpeechWithGoogle("Kafuu chino", "chino"))
