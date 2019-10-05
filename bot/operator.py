@@ -51,11 +51,11 @@ class Operator(Command, Messages, Function):
                 if self.is_command(msg, ["reboot"]):
                     self.reboot(msg)
 
+                if self.is_command(msg, ["contact"], typ="st", to_types=[1, 2]):
+                    self.send_contact(msg)
+
         if msg.contentType == ContentType.CONTACT:
             if "mid" in msg.contentMetadata:
                 self.get_contact(msg, msg.contentMetadata["mid"])
-
-        if msg.contentType == ContentType.MUSIC:
-            self.send_music_profile_meta(msg)
 
         self.read_message(msg)

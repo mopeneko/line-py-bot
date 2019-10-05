@@ -13,7 +13,7 @@ from akad.ttypes import Message, ContentType, FeatureType
 
 
 class Messages:
-    reqSeq=0
+    reqSeq={}
 
     def sendMessageWithMention(self, to, text, mids):
         """
@@ -50,9 +50,11 @@ class Messages:
             msg.relatedMessageServiceCode = 1
             msg.messageRelationType = 3
 
-        self.reqSeq += 1
+        if to not in self.reqSeq:
+            self.reqSeq[to] = 0
+        self.reqSeq[to] += 1
 
-        return self.line.talk.sendMessage(self.reqSeq, msg), self.reqSeq
+        return self.line.talk.sendMessage(self.reqSeq, msg), self.reqSeq[to]
 
     def sendImage(self, msg, path):
         reqSeq = self.sendMessage(msg.to, contentType=ContentType.IMAGE)[1]

@@ -5,7 +5,7 @@
 import os
 import time
 
-from akad.ttypes import Message
+from akad.ttypes import Message, ContentType
 
 
 class Command:
@@ -40,7 +40,7 @@ class Command:
                                  f"[speed]")
 
     def test(self, msg):
-        self.sendMessage(msg.to, "Ready 未定 Bot")
+        self.sendMessage(msg.to, "Ready Line Py Bot")
 
     def get_speed(self, msg):
         start_time = time.time()
@@ -53,3 +53,12 @@ class Command:
     def reboot(self, msg):
         self.sendMessage(msg.to, "...")
         os.execvp("python3", ["python3", "main.py", msg.to])
+
+    def send_contact(self, msg):
+        texts = msg.text.lower().split()
+        if len(texts) >= 2:
+            mid = texts[1]
+            try:
+                self.sendMessage(msg.to, contentType=ContentType.CONTACT, contentMetadata={"mid": mid})
+            except:
+                self.sendMessage(msg.to, "存在しないアカウントです")
