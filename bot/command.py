@@ -5,7 +5,7 @@
 import os
 import time
 
-from akad.ttypes import Message, ContentType
+from akad.ttypes import ContentType
 
 
 class Command:
@@ -13,10 +13,9 @@ class Command:
     def __init__(self):
         pass
 
-    def is_command(self, msg:Message, cmds:list, prefix:list=[], typ:str="is", to_types:list=[0,1,2]) -> bool:
+    def is_command(self, text:str, cmds:list, prefix:list=[], typ:str="is", to_types:list=[0,1,2]) -> bool:
 
         if msg.text and msg.toType in to_types:
-            text  = msg.text
             lower = text.lower()
 
             if prefix:
@@ -35,9 +34,9 @@ class Command:
         return False
 
     def get_help(self, msg):
-        self.sendMessage(msg.to, f"[help]" + "\n" \
-                                 f"[test]" + "\n" \
-                                 f"[speed]")
+        self.sendMessage(msg.to, "[help]\n" \
+                                 "[test]\n" \
+                                 "[speed]")
 
     def test(self, msg):
         self.sendMessage(msg.to, "Ready Line Py Bot")
