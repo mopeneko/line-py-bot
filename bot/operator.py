@@ -13,7 +13,6 @@ from .function import Function
 
 
 class Operator(Command, Messages, Function):
-    reqSeq_ids = {}
 
     def __init__(self):
         self.poll.addOpInterruptWithDict({
@@ -37,7 +36,6 @@ class Operator(Command, Messages, Function):
         if msg.contentType == ContentType.NONE:
             if msg.text:
                 text = msg.text
-                lowered = text.lower()
 
                 if self.is_command(msg, ["help"], to_types=[1, 2]):
                     self.get_help(msg)
